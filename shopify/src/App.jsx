@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getUsers } from "./api/userapi";
+import { getUsers } from "./api/userApi";
 import { AuthProvider } from "./context/AuthContext";
 import { SearchProvider } from "./context/SearchContext";
 import { CartProvider } from "./context/CartContext";
