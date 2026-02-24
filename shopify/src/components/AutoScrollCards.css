@@ -1,0 +1,161 @@
+.auto-scroll-container {
+  width: 100%;
+  overflow: hidden;
+  background: #ffffff;
+  padding: 2rem 0;
+  position: relative;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.auto-scroll-wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
+.auto-scroll-content {
+  display: flex;
+  gap: 1rem;
+  animation: scroll 30s linear infinite;
+  width: fit-content;
+}
+
+.auto-scroll-content:hover {
+  animation-play-state: paused;
+}
+
+.scroll-card {
+  flex-shrink: 0;
+  width: 300px;
+  height: 150px;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.scroll-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  border-color: #d1d5db;
+}
+
+.scroll-card:hover::before {
+  opacity: 1;
+}
+
+.card-icon {
+  font-size: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex: 1;
+  color: #ffffff;
+  z-index: 1;
+  position: relative;
+}
+
+.card-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .auto-scroll-container {
+    padding: 1rem 0;
+  }
+
+  .scroll-card {
+    width: 240px;
+    height: 120px;
+    padding: 1.25rem;
+  }
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 2.5rem;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .auto-scroll-content {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-card {
+    width: 200px;
+    height: 110px;
+    padding: 1rem;
+  }
+
+  .card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 2rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.8rem;
+  }
+}
