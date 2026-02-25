@@ -9,7 +9,7 @@ function ProductCard({ product }) {
   const [quantity, setQuantity] = useState(1);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const { addToCart, updateCartQuantity, removeFromCart, getCartItemQuantity, isLoading: cartLoading } = useCart();
+  const { addToCart, updateCartQuantity, removeFromCart, getCartItemQuantity, isProductLoading } = useCart();
   const { isAuthenticated } = useAuth();
 
   // Get current cart quantity for this product
@@ -235,9 +235,9 @@ function ProductCard({ product }) {
             <button 
               className="btn-add-cart" 
               onClick={handleAddToCart}
-              disabled={cartLoading}
+              disabled={isProductLoading(product.id)}
             >
-              {cartLoading ? "Adding..." : cartQuantity > 0 ? "Update Cart" : "Add to Cart"}
+              {isProductLoading(product.id) ? "Adding..." : cartQuantity > 0 ? "Update Cart" : "Add to Cart"}
             </button>
             <button className="btn-buy-now" onClick={handleBuyNow}>
               Buy Now

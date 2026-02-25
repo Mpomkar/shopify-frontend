@@ -7,7 +7,7 @@ const CartContext = createContext(null);
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loadingProducts, setLoadingProducts] = useState(new Set());
   const { token, isAuthenticated } = useAuth();
 
   // Calculate cart count from cart items
@@ -22,7 +22,7 @@ export function CartProvider({ children }) {
     }
 
     try {
-      setIsLoading(true);
+      setLoadingProducts((prev) => new Set(prev).add(productId));
       const result = await addToCartAPI(productId, quantity, token);
       
       if (result.success) {
@@ -45,7 +45,11 @@ export function CartProvider({ children }) {
     } catch (error) {
       return { success: false, error: error.message };
     } finally {
-      setIsLoading(false);
+      setLoadingProducts((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
     }
   };
 
@@ -55,7 +59,7 @@ export function CartProvider({ children }) {
     }
 
     try {
-      setIsLoading(true);
+      setLoadingProducts((prev) => new Set(prev).add(productId));
       const result = await removeFromCartAPI(productId, token);
       
       if (result.success) {
@@ -69,7 +73,11 @@ export function CartProvider({ children }) {
     } catch (error) {
       return { success: false, error: error.message };
     } finally {
-      setIsLoading(false);
+      setLoadingProducts((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
     }
   };
 
@@ -83,7 +91,7 @@ export function CartProvider({ children }) {
     }
 
     try {
-      setIsLoading(true);
+      setLoadingProducts((prev) => new Set(prev).add(productId));
       const result = await updateCartQuantityAPI(productId, quantity, token);
       
       if (result.success) {
@@ -99,13 +107,21 @@ export function CartProvider({ children }) {
     } catch (error) {
       return { success: false, error: error.message };
     } finally {
-      setIsLoading(false);
+      setLoadingProducts((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(productId);
+        return newSet;
+      });
     }
   };
 
   const getCartItemQuantity = (productId) => {
     const item = cartItems.find((item) => item.productId === productId);
     return item ? item.quantity : 0;
+  };
+
+  const isProductLoading = (productId) => {
+    return loadingProducts.has(productId);
   };
 
   const clearCart = () => {
@@ -116,7 +132,8 @@ export function CartProvider({ children }) {
   const value = {
     cartItems,
     cartCount,
-    isLoading,
+    isLoading: loadingProducts.size > 0,
+    isProductLoading,
     addToCart,
     removeFromCart,
     updateCartQuantity,
