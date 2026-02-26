@@ -72,8 +72,10 @@ export function AuthProvider({ children }) {
 
         setUser(userData);
         setToken(authToken);
+        setUserType("user");
         localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("token", authToken);
+        localStorage.setItem("userType", "user");
         
         return { success: true, user: userData, token: authToken };
       } else {
@@ -283,6 +285,16 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const updateUser = (updatedUserData) => {
+    setUser(updatedUserData);
+    localStorage.setItem("user", JSON.stringify(updatedUserData));
+  };
+
+  const updateSeller = (updatedSellerData) => {
+    setSeller(updatedSellerData);
+    localStorage.setItem("seller", JSON.stringify(updatedSellerData));
+  };
+
   const logout = () => {
     setUser(null);
     setSeller(null);
@@ -308,6 +320,8 @@ export function AuthProvider({ children }) {
     sellerSignup,
     adminLogin,
     logout,
+    updateUser,
+    updateSeller,
     isLoading,
     isAuthenticated: !!(user || seller || admin) && !!token,
   };
