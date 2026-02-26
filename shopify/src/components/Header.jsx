@@ -5,12 +5,14 @@ import { useCart } from "../context/CartContext";
 import { searchProducts } from "../api/productApi";
 import AuthModal from "./AuthModal";
 import CartDropdown from "./CartDropdown";
+import ProfileModal from "./ProfileModal";
 import "./Header.css";
 
 function Header() {
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const cartMenuRef = useRef(null);
   const { user, seller, admin, userType, logout, isAuthenticated } = useAuth();
@@ -64,8 +66,7 @@ function Header() {
 
   const handleProfileClick = () => {
     if (isAuthenticated) {
-      // Show user menu or profile page
-      console.log("User profile:", user);
+      setIsProfileModalOpen(true);
     } else {
       setIsAuthModalOpen(true);
     }
@@ -259,6 +260,10 @@ function Header() {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+      />
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
       />
     </>
   );
