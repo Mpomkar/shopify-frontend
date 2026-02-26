@@ -23,13 +23,13 @@ function AppContent() {
     <div className="app">
       <Header />
       {/* <AutoScrollCards /> */}
-      {/* <main className="main-content">
+      <main className="main-content">
         {userType === "seller" ? (
           <SellerDashboard />
         ) : (
           <ProductGrid />
         )}
-      </main> */}
+      </main>
       {userType !== "seller" && <Footer />}
     </div>
   );
