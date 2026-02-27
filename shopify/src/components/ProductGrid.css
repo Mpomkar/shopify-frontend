@@ -35,6 +35,10 @@
   width: 100%;
 }
 
+.product-grid > * {
+  min-width: 0;
+}
+
 @media (min-width: 1400px) {
   .product-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
