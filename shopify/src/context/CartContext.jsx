@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { addToCart as addToCartAPI, removeFromCart as removeFromCartAPI, updateCartQuantity as updateCartQuantityAPI } from "../api/cartApi";
 
+const GUEST_CART_KEY = "shopify_guest_cart";
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
@@ -10,6 +11,65 @@ export function CartProvider({ children }) {
   const [loadingProducts, setLoadingProducts] = useState(new Set());
   const { token, isAuthenticated } = useAuth();
 
+  // Load guest cart when not authenticated; when user logs in, sync guest cart to server
+  useEffect(() => {
+    if (!isAuthenticated) {
+      try {
+        const saved = localStorage.getItem(GUEST_CART_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setCartItems(Array.isArray(parsed) ? parsed : []);
+        } else {
+          setCartItems([]);
+        }
+      } catch {
+        setCartItems([]);
+      }
+    } else {
+      // User is authenticated: sync guest cart to server if present, then clear guest storage
+      let guestCart = [];
+      try {
+        const saved = localStorage.getItem(GUEST_CART_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          guestCart = Array.isArray(parsed) ? parsed : [];
+        }
+      } catch {}
+
+      if (guestCart.length > 0 && token) {
+        (async () => {
+          const synced = [];
+          for (const item of guestCart) {
+            const result = await addToCartAPI(item.productId, item.quantity, token);
+            if (result.success) {
+              synced.push({ productId: item.productId, quantity: item.quantity });
+            }
+          }
+          setCartItems(synced);
+          try {
+            localStorage.removeItem(GUEST_CART_KEY);
+          } catch {}
+        })();
+      } else {
+        try {
+          localStorage.removeItem(GUEST_CART_KEY);
+        } catch {}
+        if (guestCart.length === 0) {
+          setCartItems([]);
+        }
+      }
+    }
+  }, [isAuthenticated, token]);
+
+  // Persist guest cart to localStorage when not authenticated
+  useEffect(() => {
+    if (!isAuthenticated && cartItems.length >= 0) {
+      try {
+        localStorage.setItem(GUEST_CART_KEY, JSON.stringify(cartItems));
+      } catch {}
+    }
+  }, [isAuthenticated, cartItems]);
+
   // Calculate cart count from cart items
   useEffect(() => {
     const totalCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -17,16 +77,30 @@ export function CartProvider({ children }) {
   }, [cartItems]);
 
   const addToCart = async (productId, quantity) => {
+    // Guest: add to cart directly (local state + localStorage)
     if (!isAuthenticated || !token) {
-      return { success: false, error: "Please login to add items to cart" };
+      setCartItems((prevItems) => {
+        const existingItem = prevItems.find((item) => item.productId === productId);
+        let next;
+        if (existingItem) {
+          next = prevItems.map((item) =>
+            item.productId === productId
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
+        } else {
+          next = [...prevItems, { productId, quantity }];
+        }
+        return next;
+      });
+      return { success: true, message: "Item added to cart" };
     }
 
     try {
       setLoadingProducts((prev) => new Set(prev).add(productId));
       const result = await addToCartAPI(productId, quantity, token);
-      
+
       if (result.success) {
-        // Update local cart state
         setCartItems((prevItems) => {
           const existingItem = prevItems.find((item) => item.productId === productId);
           if (existingItem) {
@@ -40,7 +114,7 @@ export function CartProvider({ children }) {
           }
         });
       }
-      
+
       return result;
     } catch (error) {
       return { success: false, error: error.message };
@@ -55,20 +129,22 @@ export function CartProvider({ children }) {
 
   const removeFromCart = async (productId) => {
     if (!isAuthenticated || !token) {
-      return { success: false, error: "Please login to remove items from cart" };
+      setCartItems((prevItems) =>
+        prevItems.filter((item) => item.productId !== productId)
+      );
+      return { success: true, message: "Item removed from cart" };
     }
 
     try {
       setLoadingProducts((prev) => new Set(prev).add(productId));
       const result = await removeFromCartAPI(productId, token);
-      
+
       if (result.success) {
-        // Update local cart state
         setCartItems((prevItems) =>
           prevItems.filter((item) => item.productId !== productId)
         );
       }
-      
+
       return result;
     } catch (error) {
       return { success: false, error: error.message };
@@ -83,7 +159,18 @@ export function CartProvider({ children }) {
 
   const updateCartQuantity = async (productId, quantity) => {
     if (!isAuthenticated || !token) {
-      return { success: false, error: "Please login to update cart" };
+      if (quantity <= 0) {
+        setCartItems((prevItems) =>
+          prevItems.filter((item) => item.productId !== productId)
+        );
+        return { success: true };
+      }
+      setCartItems((prevItems) =>
+        prevItems.map((item) =>
+          item.productId === productId ? { ...item, quantity } : item
+        )
+      );
+      return { success: true };
     }
 
     if (quantity <= 0) {
@@ -93,16 +180,15 @@ export function CartProvider({ children }) {
     try {
       setLoadingProducts((prev) => new Set(prev).add(productId));
       const result = await updateCartQuantityAPI(productId, quantity, token);
-      
+
       if (result.success) {
-        // Update local cart state
         setCartItems((prevItems) =>
           prevItems.map((item) =>
             item.productId === productId ? { ...item, quantity } : item
           )
         );
       }
-      
+
       return result;
     } catch (error) {
       return { success: false, error: error.message };

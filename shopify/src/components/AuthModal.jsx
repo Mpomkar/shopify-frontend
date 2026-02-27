@@ -1,13 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Login from "./Login";
 import Signup from "./Signup";
 import SellerLogin from "./SellerLogin";
 import SellerSignup from "./SellerSignup";
 import "./Auth.css";
 
-function AuthModal({ isOpen, onClose, defaultType = "user" }) {
+function AuthModal({ isOpen, onClose, defaultType = "user", userOnly = false }) {
   const [authType, setAuthType] = useState(defaultType); // 'user', 'seller', 'admin'
   const [isLogin, setIsLogin] = useState(true);
+
+  // When userOnly, force user type and sync when modal opens
+  useEffect(() => {
+    if (isOpen && userOnly) {
+      setAuthType("user");
+    }
+  }, [isOpen, userOnly]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -16,7 +36,9 @@ function AuthModal({ isOpen, onClose, defaultType = "user" }) {
     setIsLogin(true);
   };
 
-  return (
+  const effectiveAuthType = userOnly ? "user" : authType;
+
+  const modalContent = (
     <div className="auth-modal-overlay" onClick={onClose}>
       <div className="auth-modal" onClick={(e) => e.stopPropagation()}>
         <button className="auth-modal-close" onClick={onClose} aria-label="Close">
@@ -35,24 +57,26 @@ function AuthModal({ isOpen, onClose, defaultType = "user" }) {
           </svg>
         </button>
 
-        {/* Auth Type Selector */}
-        <div className="auth-type-selector">
-          <button
-            className={`auth-type-btn ${authType === "user" ? "active" : ""}`}
-            onClick={() => handleTypeSwitch("user")}
-          >
-            User
-          </button>
-          <button
-            className={`auth-type-btn ${authType === "seller" ? "active" : ""}`}
-            onClick={() => handleTypeSwitch("seller")}
-          >
-            Seller
-          </button>
-        </div>
+        {/* Auth Type Selector - hidden when userOnly (e.g. Buy Now) */}
+        {!userOnly && (
+          <div className="auth-type-selector">
+            <button
+              className={`auth-type-btn ${authType === "user" ? "active" : ""}`}
+              onClick={() => handleTypeSwitch("user")}
+            >
+              User
+            </button>
+            <button
+              className={`auth-type-btn ${authType === "seller" ? "active" : ""}`}
+              onClick={() => handleTypeSwitch("seller")}
+            >
+              Seller
+            </button>
+          </div>
+        )}
 
         {/* Render appropriate component based on auth type */}
-        {authType === "user" && (
+        {effectiveAuthType === "user" && (
           <>
             {isLogin ? (
               <Login
@@ -68,7 +92,7 @@ function AuthModal({ isOpen, onClose, defaultType = "user" }) {
           </>
         )}
 
-        {authType === "seller" && (
+        {effectiveAuthType === "seller" && (
           <>
             {isLogin ? (
               <SellerLogin
@@ -86,6 +110,9 @@ function AuthModal({ isOpen, onClose, defaultType = "user" }) {
       </div>
     </div>
   );
+
+  // Render modal in a portal so it's always on top with true full-screen overlay (centered, blurred)
+  return createPortal(modalContent, document.body);
 }
 
 export default AuthModal;

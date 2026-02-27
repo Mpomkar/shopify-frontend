@@ -43,22 +43,17 @@ function ProductCard({ product }) {
   };
 
   const handleAddToCart = async () => {
-    if (!isAuthenticated) {
-      setIsAuthModalOpen(true);
-      return;
-    }
-
     try {
       setMessage("");
       let result;
-      
+
       // If item already exists in cart, update quantity instead of adding
       if (cartQuantity > 0) {
         result = await updateCartQuantity(product.id, quantity);
       } else {
         result = await addToCart(product.id, quantity);
       }
-      
+
       if (result.success) {
         setMessage(cartQuantity > 0 ? "Cart updated!" : "Item added to cart!");
         setTimeout(() => setMessage(""), 3000);
@@ -253,6 +248,7 @@ function ProductCard({ product }) {
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
+        userOnly
       />
     </div>
   );

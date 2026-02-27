@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { getProducts } from "../api/productApi";
 import "./CartDropdown.css";
 
-function CartDropdown({ onClose }) {
+function CartDropdown({ onClose, onLoginClick }) {
   const { cartItems, cartCount, isLoading, removeFromCart, updateCartQuantity } = useCart();
   const { isAuthenticated } = useAuth();
   const [products, setProducts] = useState([]);
@@ -59,7 +59,7 @@ function CartDropdown({ onClose }) {
     }, 0);
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && cartCount === 0) {
     return (
       <div className="cart-dropdown">
         <div className="cart-dropdown-header">
@@ -79,8 +79,8 @@ function CartDropdown({ onClose }) {
               <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
           </div>
-          <h3>Please Login</h3>
-          <p>Sign in to view your cart</p>
+          <h3>Your bag is empty</h3>
+          <p>Add items from the store to get started</p>
         </div>
       </div>
     );
@@ -207,8 +207,11 @@ function CartDropdown({ onClose }) {
           <span className="total-label">Total:</span>
           <span className="total-amount">${calculateTotal().toFixed(2)}</span>
         </div>
-        <button className="btn-checkout">
-          Proceed to Checkout
+        <button
+          className="btn-checkout"
+          onClick={!isAuthenticated && onLoginClick ? () => { onClose(); onLoginClick(); } : undefined}
+        >
+          {isAuthenticated ? "Proceed to Checkout" : "Login to Checkout"}
         </button>
       </div>
     </div>
