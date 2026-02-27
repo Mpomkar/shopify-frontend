@@ -128,7 +128,7 @@ function CartDropdown({ onClose }) {
           </div>
           <h3>Your bag is empty</h3>
           <p className="empty-cart-message">
-            Your cart is ready to roll, but it's find a bit empty without some stylish finds
+            Your cart is ready to roll, but it's a bit empty without some stylish finds
           </p>
           <div className="empty-cart-actions">
             <button className="btn-start-shopping" onClick={onClose}>
