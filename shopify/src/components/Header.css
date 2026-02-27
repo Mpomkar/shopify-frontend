@@ -172,6 +172,19 @@
   color: #ff6b35;
 }
 
+.profile-button:hover .header-profile-avatar {
+  box-shadow: 0 0 0 2px #ff6b35;
+}
+
+.header-profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  transition: box-shadow 0.2s ease;
+}
+
 .cart-menu {
   position: relative;
 }

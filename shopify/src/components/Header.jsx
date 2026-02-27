@@ -121,7 +121,15 @@ function Header() {
                   type="text"
                   placeholder="Search for products, brands and more..."
                   value={localSearchQuery}
-                  onChange={(e) => setLocalSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setLocalSearchQuery(value);
+                    if (!value.trim()) {
+                      setSearchQuery("");
+                      setSearchResults(null);
+                      setGlobalIsSearching(false);
+                    }
+                  }}
                   className="search-input"
                 />
               </div>
@@ -156,7 +164,13 @@ function Header() {
                 {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
               </button>
               {isCartOpen && (
-                <CartDropdown onClose={() => setIsCartOpen(false)} />
+                <CartDropdown
+                  onClose={() => setIsCartOpen(false)}
+                  onLoginClick={() => {
+                    setIsCartOpen(false);
+                    setIsAuthModalOpen(true);
+                  }}
+                />
               )}
             </div>
             {isAuthenticated ? (
@@ -166,26 +180,40 @@ function Header() {
                   aria-label="Profile"
                   onClick={handleProfileClick}
                   title={
-                    userType === "user" 
+                    userType === "user"
                       ? user?.username || "User"
                       : userType === "seller"
                       ? seller?.username || "Seller"
                       : admin?.username || "Admin"
                   }
                 >
-                  <svg
-                    width="22"
-                    height="22"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
+                  {userType === "user" && user?.photoBase64 ? (
+                    <img
+                      src={`data:image/jpeg;base64,${user.photoBase64}`}
+                      alt={user?.username || "Profile"}
+                      className="header-profile-avatar"
+                    />
+                  ) : userType === "seller" && seller?.photoBase64 ? (
+                    <img
+                      src={`data:image/jpeg;base64,${seller.photoBase64}`}
+                      alt={seller?.username || "Profile"}
+                      className="header-profile-avatar"
+                    />
+                  ) : (
+                    <svg
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  )}
                 </button>
                 <div className="user-dropdown">
                   <div className="user-info">
