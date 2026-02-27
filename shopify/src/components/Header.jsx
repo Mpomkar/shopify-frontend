@@ -99,7 +99,7 @@ function Header() {
             </a>
           </div>
 
-          {/* Search Bar - Center */}
+          {/* Search Bar - Center (Zepto/Flipkart style: icon only, no button) */}
           <div className="search-container">
             <form onSubmit={handleSearch} className="search-form">
               <div className="search-wrapper">
@@ -131,15 +131,37 @@ function Header() {
                     }
                   }}
                   className="search-input"
+                  aria-label="Search products"
                 />
+                <button
+                  type="submit"
+                  className="search-icon-submit"
+                  disabled={isSearching}
+                  aria-label="Search"
+                >
+                  {isSearching ? (
+                    <span className="search-spinner" />
+                  ) : (
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                  )}
+                </button>
               </div>
-              <button type="submit" className="search-button" disabled={isSearching}>
-                {isSearching ? "Searching..." : "Search"}
-              </button>
             </form>
           </div>
 
-          {/* Right Side Actions */}
+          {/* Right: Cart, then Profile at top-right corner */}
           <div className="header-actions">
             <div className="cart-menu" ref={cartMenuRef}>
               <button 
@@ -148,8 +170,7 @@ function Header() {
                 onClick={() => setIsCartOpen(!isCartOpen)}
               >
                 <svg
-                  width="22"
-                  height="22"
+                  className="cart-icon-svg"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"

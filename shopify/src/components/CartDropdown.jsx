@@ -63,9 +63,9 @@ function CartDropdown({ onClose, onLoginClick }) {
     return (
       <div className="cart-dropdown">
         <div className="cart-dropdown-header">
-          <h3>Shopping Cart</h3>
+          <h3>My Cart</h3>
           <button className="cart-close-btn" onClick={onClose} aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -73,14 +73,17 @@ function CartDropdown({ onClose, onLoginClick }) {
         </div>
         <div className="cart-empty-state">
           <div className="empty-bag-icon">
-            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
               <path d="M3 6h18"></path>
               <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
           </div>
-          <h3>Your bag is empty</h3>
+          <h3>Your cart is empty</h3>
           <p>Add items from the store to get started</p>
+          <div className="empty-cart-actions">
+            <button className="btn-start-shopping" onClick={onClose}>Start Shopping</button>
+          </div>
         </div>
       </div>
     );
@@ -90,9 +93,9 @@ function CartDropdown({ onClose, onLoginClick }) {
     return (
       <div className="cart-dropdown">
         <div className="cart-dropdown-header">
-          <h3>Shopping Cart</h3>
+          <h3>My Cart</h3>
           <button className="cart-close-btn" onClick={onClose} aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -110,9 +113,9 @@ function CartDropdown({ onClose, onLoginClick }) {
     return (
       <div className="cart-dropdown">
         <div className="cart-dropdown-header">
-          <h3>Your Bag</h3>
+          <h3>My Cart</h3>
           <button className="cart-close-btn" onClick={onClose} aria-label="Close">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -120,23 +123,16 @@ function CartDropdown({ onClose, onLoginClick }) {
         </div>
         <div className="cart-empty-state">
           <div className="empty-bag-icon">
-            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
               <path d="M3 6h18"></path>
               <path d="M16 10a4 4 0 0 1-8 0"></path>
             </svg>
           </div>
-          <h3>Your bag is empty</h3>
-          <p className="empty-cart-message">
-            Your cart is ready to roll, but it's a bit empty without some stylish finds
-          </p>
+          <h3>Your cart is empty</h3>
+          <p className="empty-cart-message">Add items from the store to get started</p>
           <div className="empty-cart-actions">
-            <button className="btn-start-shopping" onClick={onClose}>
-              Start Shopping
-            </button>
-            <button className="btn-add-wishlist">
-              Add from Wishlist
-            </button>
+            <button className="btn-start-shopping" onClick={onClose}>Start Shopping</button>
           </div>
         </div>
       </div>
@@ -146,9 +142,9 @@ function CartDropdown({ onClose, onLoginClick }) {
   return (
     <div className="cart-dropdown">
       <div className="cart-dropdown-header">
-        <h3>Shopping Cart ({cartCount} {cartCount === 1 ? 'item' : 'items'})</h3>
+        <h3>My Cart ({cartCount} {cartCount === 1 ? 'item' : 'items'})</h3>
         <button className="cart-close-btn" onClick={onClose} aria-label="Close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -159,7 +155,17 @@ function CartDropdown({ onClose, onLoginClick }) {
         {products.map((product) => (
           <div key={product.id} className="cart-item">
             <div className="cart-item-image">
-              <img src={product.images[0]} alt={product.name} />
+              {product.images?.[0] ? (
+                <img src={product.images[0]} alt={product.name} />
+              ) : (
+                <div className="cart-item-image-placeholder" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                    <path d="M3 6h18"></path>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
+                </div>
+              )}
             </div>
             <div className="cart-item-details">
               <h4 className="cart-item-name">{product.name}</h4>
